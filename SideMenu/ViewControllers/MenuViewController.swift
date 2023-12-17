@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol MenuViewControllerDelegate: AnyObject {
+    func didSelect(menuItem: MenuViewController.MenuOptions)
+}
+
 class MenuViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    weak var delegate: MenuViewControllerDelegate?
     
     enum MenuOptions: String, CaseIterable {
         case home = "Home"
@@ -76,6 +82,8 @@ class MenuViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let item = MenuOptions.allCases[indexPath.row]
+        delegate?.didSelect(menuItem: item)
     }
 
 }

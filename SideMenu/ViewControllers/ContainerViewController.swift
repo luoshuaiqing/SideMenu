@@ -19,6 +19,7 @@ class ContainerViewController: UIViewController {
     let menuVC = MenuViewController()
     let homeVC = HomeViewController()
     var navVC: UINavigationController?
+    lazy var infoVC = InfoViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +30,7 @@ class ContainerViewController: UIViewController {
 
     private func addChildVCs() {
         // Menu
+        menuVC.delegate = self
         addChild(menuVC)
         view.addSubview(menuVC.view)
         menuVC.didMove(toParent: self)
@@ -46,6 +48,10 @@ class ContainerViewController: UIViewController {
 
 extension ContainerViewController: HomeViewControllerDelegate {
     func didTapMenuButton() {
+        toggleMenu()
+    }
+    
+    func toggleMenu(completion: (() -> Void)? = nil) {
         guard let navVC else { return }
         // Animate the menu
         switch menuState {
@@ -63,7 +69,37 @@ extension ContainerViewController: HomeViewControllerDelegate {
             } completion: { [weak self] done in
                 if done {
                     self?.menuState = .closed
+                    DispatchQueue.main.async {
+                        completion?()
+                    }
                 }
+            }
+        }
+    }
+}
+
+extension ContainerViewController: MenuViewControllerDelegate {
+    func didSelect(menuItem: MenuViewController.MenuOptions) {
+        toggleMenu { [weak self] in
+            guard let self else { return }
+            switch menuItem {
+            case .home:
+                infoVC.view.removeFromSuperview()
+                infoVC.didMove(toParent: nil)
+                homeVC.title = "Home"
+            case .info:
+                // Add info child
+                homeVC.addChild(infoVC)
+                homeVC.view.addSubview(infoVC.view)
+                infoVC.view.frame = homeVC.view.bounds
+                infoVC.didMove(toParent: homeVC)
+                homeVC.title = infoVC.title
+            case .appRating:
+                break
+            case .shareApp:
+                break
+            case .settings:
+                break
             }
         }
     }
