@@ -58,7 +58,13 @@ extension ContainerViewController: HomeViewControllerDelegate {
                 }
             }
         case .opened:
-            break
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, options: .curveEaseInOut) {
+                navVC.view.frame.origin.x = 0
+            } completion: { [weak self] done in
+                if done {
+                    self?.menuState = .closed
+                }
+            }
         }
     }
 }
